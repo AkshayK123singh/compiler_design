@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>C Code Runner with Input</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- CodeMirror core CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/codemirror.min.css" />
+
+  <!-- Multiple CodeMirror themes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/theme/material-darker.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/theme/eclipse.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/theme/dracula.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/theme/monokai.min.css" />
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      padding: 2rem;
+      max-width: 1000px;
+      margin: auto;
+      color: #f0f0f5;
+      display: flex;
+      flex-direction: column;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-weight: 700;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    label {
+      margin: 1rem 0 0.5rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #e0e0ffdd;
+    }
+    .CodeMirror, textarea {
+      font-family: 'Fira Code', monospace;
+      font-size: 1.05rem;
+      border-radius: 12px;
+      border: none;
+      background: #2a2f46;
+      color: #cdd6f4;
+      width: 100%;
+      padding: 1rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    button {
+      background: #81a1c1;
+      color: #2e3440;
+      font-weight: 700;
+      padding: 0.9rem 2rem;
+      margin-top: 1.5rem;
+      border-radius: 12px;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 4px 20px rgba(129, 161, 193, 0.5);
+      transition: transform 0.2s ease;
+    }
+    button:hover {
+      background: #5e81ac;
+      transform: scale(1.05);
+    }
+    #output, #stats {
+      background: #2e3440;
+      padding: 1rem;
+      border-radius: 14px;
+      margin-top: 1.5rem;
+      color: #a3be8c;
+      font-family: 'Fira Code', monospace;
+      white-space: pre-wrap;
+      box-shadow: inset 0 0 10px #4c566a;
+    }
+    .alert {
+      background: #bf616a;
+      color: #2e3440;
+      padding: 1rem;
+      border-radius: 14px;
+      margin-top: 1rem;
+      text-align: center;
+      font-weight: 700;
+    }
+    .actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .theme-toggle {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .theme-toggle button {
+      background: transparent;
+      color: #fff;
+      font-size: 1rem;
+      border: 2px solid #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>C Code Runner with Input & Stats</h1>
+
+  <label for="codeInput">C Code:</label>
+  <textarea id="codeInput"></textarea>
+
+  <label for="programInput">Input (stdin):</label>
+  <textarea id="programInput" placeholder="e.g.\n5\n10\n..." rows="3"></textarea>
+
+  <div class="actions">
+    <button onclick="runCode()">Run Code</button>
+    <button onclick="copyOutput()">Copy Output</button>
+    <button onclick="downloadOutput()">Download Output</button>
+  </div>
+
+  <div id="alertBox" class="alert" style="display:none;"></div>
+
+  <label for="output">Output:</label>
+  <pre id="output">Output will appear here...</pre>
+
+  <div id="stats">
+    <strong>Execution Stats:</strong><br>
+    Time: <span id="execTime">-</span> ms<br>
+    Memory: <span id="memoryUsed">-</span> KB
+  </div>
+
+  <div class="theme-toggle">
+    <button onclick="toggleTheme()">Toggle Theme</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/mode/clike/clike.min.js"></script>
+
+  <script>
+    let editor = CodeMirror.fromTextArea(document.getElementById("codeInput"), {
+      lineNumbers: true,
+      mode: "text/x-csrc",
+      theme: "material-darker",
+      tabSize: 4,
+      autoCloseBrackets: true
+    });
+
+    // Multiple themes and their background/text colors
+    const themes = [
+      {
+        name: "material-darker",
+        bg: "linear-gradient(135deg, #667eea, #764ba2)",
+        color: "#f0f0f5"
+      },
+      {
+        name: "default",
+        bg: "#f0f0f0",
+        color: "#1c1c1c"
+      },
+      {
+        name: "eclipse",
+        bg: "#2d2d2d",
+        color: "#f8f8f2"
+      },
+      {
+        name: "dracula",
+        bg: "#282a36",
+        color: "#f8f8f2"
+      },
+      {
+        name: "monokai",
+        bg: "#272822",
+        color: "#f8f8f2"
+      }
+    ];
+
+    let currentThemeIndex = 0;
+
+    function toggleTheme() {
+      currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+      const theme = themes[currentThemeIndex];
+
+      editor.setOption("theme", theme.name);
+      document.body.style.background = theme.bg;
+      document.body.style.color = theme.color;
+    }
+
+    function typeText(elem, text) {
+      elem.textContent = "";
+      let i = 0;
+      const speed = 20;
+      function type() {
+        if (i < text.length) {
+          elem.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        }
+      }
+      type();
+    }
+
+    async function runCode() {
+      const code = editor.getValue().trim();
+      const progInput = document.getElementById('programInput').value;
+
+      const alertBox = document.getElementById('alertBox');
+      const outputElem = document.getElementById('output');
+      const timeElem = document.getElementById('execTime');
+      const memoryElem = document.getElementById('memoryUsed');
+
+      alertBox.style.display = 'none';
+      outputElem.textContent = "Compiling and running...";
+
+      if (!code) {
+        alert("Please enter C code first.");
+        return;
+      }
+
+      try {
+        const response = await fetch('/run_c_code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, input: progInput })
+        });
+
+        const result = await response.json();
+
+        if (result.error) {
+          alertBox.style.display = 'block';
+          alertBox.textContent = "Error: " + result.error;
+          outputElem.textContent = "";
+        } else {
+          const output = result.output || "Program finished with no output.";
+          typeText(outputElem, output);
+          timeElem.textContent = result.exec_time || "N/A";
+          memoryElem.textContent = result.memory_used || "N/A";
+        }
+      } catch (err) {
+        alertBox.style.display = 'block';
+        alertBox.textContent = "Error: Backend unreachable.";
+        outputElem.textContent = "";
+      }
+    }
+
+    function copyOutput() {
+      const text = document.getElementById('output').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Output copied to clipboard!");
+      });
+    }
+
+    function downloadOutput() {
+      const text = document.getElementById('output').textContent;
+      const blob = new Blob([text], { type: "text/plain" });
+      const link = document.createElement('a');
+      link.download = "output.txt";
+      link.href = URL.createObjectURL(blob);
+      link.click();
+    }
+  </script>
+</body>
+</html>
