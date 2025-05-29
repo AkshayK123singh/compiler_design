@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Compiler Insights</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/material-darker.min.css"> 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    
+    <style>
+        /* Custom CSS Variables for Theming */
+        :root {
+            /* Light Theme Defaults */
+            --front-page-bg-start: #a1c4fd; /* Softer, light sky blue */
+            --front-page-bg-end: #c2e9fb;   /* Very light cyan */
+            --front-page-content-bg: rgba(255, 255, 255, 0.65); /* More opaque for contrast on light background */
+            --front-page-text-color: #333333; /* Darker text for readability on light background */
+            --front-page-heading-shadow: rgba(0, 0, 0, 0.15); /* Subtler shadow for light heading */
+            --front-page-button-bg: #4a90e2; /* A clear, slightly vibrant blue */
+            --front-page-button-text: #ffffff; /* White text on blue button */
+            --front-page-button-hover-bg: #357bd8; /* Darker blue on hover */
+            --front-page-button-border: rgba(74, 144, 226, 0.8); /* Matches button color */
+            --front-page-scroll-indicator-color: #555555; /* Darker for contrast */
+            --front-page-shape-color: rgba(0, 0, 0, 0.08); /* Subtler shapes */
+            --front-page-theme-toggle-bg: rgba(255, 255, 255, 0.4); /* Still somewhat translucent */
+            --front-page-theme-toggle-text: #333333; /* Darker text for toggle */
+            --front-page-theme-toggle-hover-bg: rgba(255, 255, 255, 0.55);
+            --front-page-h1-gradient-start: #1a73e8; /* Google Blue */
+            --front-page-h1-gradient-end: #0c64d4;   /* Darker Google Blue */
+            --front-page-content-shadow: 0 25px 50px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.3) inset; /* Soft shadow, inner border */
+            --front-page-content-hover-shadow: 0 35px 70px rgba(0, 0, 0, 0.25); /* More pronounced on hover */
+
+            /* Navbar specific variables (light mode) */
+            --navbar-bg: rgba(255, 255, 255, 0.7); /* Lighter and more opaque for light mode */
+            --navbar-link-color: #333333; /* Darker text */
+            --navbar-link-hover-color: #1a73e8; /* Accent color for hover */
+            --navbar-border: rgba(0, 0, 0, 0.1); /* Subtle border */
+        }
+
+        /* Dark Theme Overrides */
+        body.dark-mode {
+            --front-page-bg-start: #1e293b; /* Darker slate */
+            --front-page-bg-end: #0f172a;   /* Deepest dark blue */
+            --front-page-content-bg: rgba(15, 23, 42, 0.4); /* Darker, slightly opaque */
+            --front-page-text-color: #cbd5e1; /* Light gray */
+            --front-page-heading-shadow: rgba(0, 0, 0, 0.6);
+            --front-page-button-bg: #334155; /* Slate-600 */
+            --front-page-button-text: #e2e8f0; /* Lighter text */
+            --front-page-button-hover-bg: #475569; /* Slate-700 */
+            --front-page-button-border: rgba(51, 65, 85, 0.7); /* Darker border */
+            --front-page-scroll-indicator-color: rgba(203, 213, 225, 0.9);
+            --front-page-shape-color: rgba(0, 0, 0, 0.3);
+            --front-page-theme-toggle-bg: rgba(15, 23, 42, 0.4);
+            --front-page-theme-toggle-text: #cbd5e1;
+            --front-page-theme-toggle-hover-bg: rgba(15, 23, 42, 0.5);
+            --front-page-h1-gradient-start: #ADD8E6; /* Light Blue */
+            --front-page-h1-gradient-end: #87CEEB;   /* Sky Blue */
+            --front-page-content-shadow: 0 25px 50px rgba(0, 0, 0, 0.45); /* Stronger shadow */
+            --front-page-content-hover-shadow: 0 35px 70px rgba(0, 0, 0, 0.6);
+
+            /* Navbar specific variables (dark mode) */
+            --navbar-bg: rgba(15, 23, 42, 0.4); /* Darker, slightly opaque */
+            --navbar-link-color: #e2e8f0;
+            --navbar-link-hover-color: #ffffff;
+            --navbar-border: rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--front-page-bg-start) 0%, var(--front-page-bg-end) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--front-page-text-color);
+            text-align: center;
+            overflow-x: hidden;
+            position: relative;
+            transition: background 0.7s ease-in-out, color 0.7s ease-in-out;
+            line-height: 1.6; /* General body line height for readability */
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--navbar-bg);
+            backdrop-filter: blur(10px);
+            padding: 1.25rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border-bottom: 1px solid var(--navbar-border);
+            transition: background-color 0.7s ease-in-out, border-color 0.7s ease-in-out, box-shadow 0.7s ease-in-out;
+        }
+        .navbar .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: var(--navbar-link-color);
+            text-decoration: none;
+            transition: color 0.7s ease-in-out;
+        }
+        .navbar .nav-links a {
+            font-family: 'Inter', sans-serif;
+            color: var(--navbar-link-color);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        .navbar .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: var(--navbar-link-hover-color);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Background animation elements */
+        .background-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+            perspective: 1000px;
+        }
+
+        .shape {
+            position: absolute;
+            background: var(--front-page-shape-color);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out alternate, shapePulse 4s infinite ease-in-out; /* Added shapePulse */
+            filter: blur(2px);
+        }
+
+        .shape:nth-child(1) { width: 180px; height: 180px; top: 15%; left: 8%; animation-duration: 18s; animation-delay: 0s; }
+        .shape:nth-child(2) { width: 90px; height: 90px; top: 35%; right: 18%; animation-duration: 14s; animation-delay: 2s; }
+        .shape:nth-child(3) { width: 220px; height: 220px; bottom: 8%; left: 25%; animation-duration: 20s; animation-delay: 4s; }
+        .shape:nth-child(4) { width: 110px; height: 110px; top: 55%; left: 55%; animation-duration: 16s; animation-delay: 1s; }
+        .shape:nth-child(5) { width: 140px; height: 140px; bottom: 25%; right: 12%; animation-duration: 17s; animation-delay: 3s; }
+
+        @keyframes float {
+            0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0.7; }
+            50% { transform: translate3d(25px, 35px, 10px) rotate(15deg); opacity: 0.5; }
+            100% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0.7; }
+        }
+
+        @keyframes shapePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); } /* Subtle scaling */
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            background: var(--front-page-content-bg);
+            padding: 4.5rem;
+            border-radius: 2rem;
+            box-shadow: var(--front-page-content-shadow); /* Dynamic shadow */
+            max-width: 950px;
+            width: 100%;
+            backdrop-filter: blur(15px);
+            animation: popIn 0.9s ease-out;
+            margin-top: 10rem;
+            margin-bottom: 4rem;
+            transition: background 0.7s ease-in-out, box-shadow 0.4s ease-in-out, transform 0.3s ease; /* Added transform transition */
+            border: 1px solid var(--navbar-border); /* Consistent border with navbar */
+        }
+
+        .content-wrapper:hover {
+            transform: translateY(-8px); /* Lift effect on hover */
+            box-shadow: var(--front-page-content-hover-shadow); /* Stronger shadow on hover */
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 5rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            text-shadow: 5px 5px 12px var(--front-page-heading-shadow);
+            transition: color 0.7s ease-in-out, text-shadow 0.7s ease-in-out;
+            background: linear-gradient(45deg, var(--front-page-h1-gradient-start), var(--front-page-h1-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.05;
+            overflow: hidden; /* Needed for typewriter effect */
+            white-space: nowrap; /* Needed for typewriter effect */
+            position: relative; /* For the blinking cursor */
+        }
+
+        h1::after {
+            content: '|';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0.1em;
+            background-color: var(--front-page-text-color); /* Matches current text color */
+            animation: blink-caret 0.75s step-end infinite;
+            display: inline-block; /* Ensure it's visible */
+            opacity: 1; /* Always visible when active */
+            transition: background-color 0.7s ease-in-out;
+        }
+
+        /* Typewriter animation will be handled by JS for more control */
+        @keyframes blink-caret {
+            from, to { background-color: transparent; }
+            50% { background-color: var(--front-page-text-color); }
+        }
+
+        p {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.6rem;
+            line-height: 1.7;
+            margin-bottom: 3.5rem;
+            opacity: 0; /* Initially hidden for staggered fade-in */
+            transition: color 0.7s ease-in-out;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.05);
+            font-weight: 300;
+            transform: translateY(40px); /* Start position for slide-up fade-in */
+        }
+        
+        /* Class for active paragraphs */
+        p.fade-in-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Smooth transition */
+        }
+
+        .cta-button {
+            background: var(--front-page-button-bg);
+            color: var(--front-page-button-text);
+            padding: 1.75rem 4rem;
+            border-radius: 9999px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 18px 35px rgba(0, 0, 0, 0.35);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            animation: bounceIn 1s ease-out forwards, pulse 3s infinite ease-in-out 2.5s;
+            animation-delay: 2.2s;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            border: 2px solid transparent;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-8px) scale(1.08) rotate(2deg); /* Added slight rotation */
+            box-shadow: 0 28px 55px rgba(0, 0, 0, 0.55), 0 0 0 4px var(--front-page-button-border); /* Added ring effect */
+            background: var(--front-page-button-hover-bg);
+            border-color: transparent; /* Border becomes part of the ring */
+        }
+
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.6); }
+            60% { opacity: 1; transform: scale(1.05); }
+            80% { transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 18px 35px rgba(0, 0, 0, 0.35); }
+            50% { transform: scale(1.02); box-shadow: 0 25px 48px rgba(0, 0, 0, 0.48); }
+            100% { transform: scale(1); box-shadow: 0 18px 35px rgba(0, 0, 0, 0.35); }
+        }
+
+        /* Scroll Down Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 3.5rem;
+            color: var(--front-page-scroll-indicator-color);
+            font-size: 1.3rem;
+            font-weight: 400;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards 3.5s; /* Removed infinite bounce from here */
+            transition: color 0.7s ease-in-out;
+            letter-spacing: 0.02em;
+        }
+        .scroll-indicator svg {
+            width: 2.8rem;
+            height: 2.8rem;
+            margin-top: 1rem;
+            animation: wave 2s infinite ease-in-out; /* New wave animation */
+            transform-origin: center bottom; /* Ensures rotation is from the bottom */
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-5px) rotate(-5deg); }
+            50% { transform: translateY(-10px) rotate(0deg); }
+            75% { transform: translateY(-5px) rotate(5deg); }
+        }
+
+        /* Theme Toggle Button */
+        #theme-toggle {
+            position: fixed;
+            bottom: 2.5rem;
+            right: 2.5rem;
+            background-color: var(--front-page-theme-toggle-bg);
+            color: var(--front-page-theme-toggle-text);
+            border: none;
+            border-radius: 9999px;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            z-index: 101;
+            backdrop-filter: blur(5px);
+        }
+        #theme-toggle:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+            background-color: var(--front-page-theme-toggle-hover-bg);
+        }
+        #theme-toggle svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            fill: currentColor;
+            transition: transform 0.3s ease;
+        }
+        #theme-toggle:hover .sun-icon {
+            transform: rotate(45deg);
+        }
+        #theme-toggle:hover .moon-icon {
+            transform: rotate(-45deg);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 900px) {
+            h1 {
+                font-size: 4rem;
+            }
+            .content-wrapper {
+                padding: 3.5rem;
+            }
+            p {
+                font-size: 1.4rem;
+            }
+            .cta-button {
+                padding: 1.25rem 3rem;
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                align-items: flex-start;
+            }
+            .navbar .logo {
+                margin-bottom: 0.5rem;
+            }
+            .navbar .nav-links {
+                margin-top: 0.5rem;
+                width: 100%;
+                justify-content: center;
+            }
+            .navbar .nav-links a {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            h1 {
+                font-size: 3.2rem;
+            }
+            p {
+                font-size: 1.1rem;
+            }
+            .content-wrapper {
+                padding: 2rem;
+                margin-top: 6rem;
+                border-radius: 1.5rem;
+            }
+            .shape {
+                display: none;
+            }
+            .scroll-indicator {
+                bottom: 1.5rem;
+                font-size: 1rem;
+            }
+            .scroll-indicator svg {
+                width: 2rem;
+                height: 2rem;
+            }
+            #theme-toggle {
+                bottom: 1.5rem;
+                right: 1.5rem;
+                padding: 0.7rem 1.1rem;
+                font-size: 0.9rem;
+            }
+            #theme-toggle svg {
+                width: 1.2rem;
+                height: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            p {
+                font-size: 1rem;
+            }
+            .cta-button {
+                padding: 1rem 2rem;
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Add pop animation for button click */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+
+        /* Ensure the button animation works */
+        .cta-button.clicking {
+            animation: pop 0.3s ease-out;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-shapes" id="background-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <nav class="navbar">
+        <a href="front.html" class="logo">Compiler Insights</a>
+        <div class="nav-links flex space-x-4">
+            <a href="front.html" class="active">Home</a>
+            <a href="keyfeature.html">Features</a>
+            <a href="about.html">About</a>
+            <a href="index.html">App</a>
+        </div>
+    </nav>
+
+    <div class="content-wrapper">
+        <h1 id="animated-heading"></h1> <p class="animated-paragraph">Dive deep into the world of compiler optimization. Our platform provides a comprehensive environment to compare JIT and Classical compiler performance side-by-side.</p>
+        <p class="animated-paragraph">Understand the subtle differences that impact your code's efficiency, memory footprint, and execution speed. Make informed decisions to enhance your software.</p>
+        <a href="index.html" class="cta-button" onclick="navigateToCompiler(event)">Start Your Analysis</a>
+    </div>
+
+    <div class="scroll-indicator">
+        Explore More
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 111.06 1.06l-7.5 7.5z" clip-rule="evenodd" />
+        </svg>
+    </div>
+
+    <button id="theme-toggle" aria-label="Toggle theme">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3A.75.75 0 0112 2.25zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.06l1.59-1.591zM12 18a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V18a.75.75 0 01.75-.75zM5.05 10.95a.75.75 0 10-1.06-1.06l-1.59 1.59a.75.75 0 101.06 1.06l1.59-1.59zM18.894 17.894a.75.75 0 001.06-1.06l-1.59-1.59a.75.75 0 00-1.06 1.06l1.59 1.59zM3.27 6.106a.75.75 0 001.06-1.06l1.59-1.59a.75.75 0 00-1.06-1.06l-1.59 1.59a.75.75 0 000 1.06zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM12 6a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H12A.75.75 0 0112 6z"/>
+        </svg>
+        <svg class="moon-icon hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.855l-1.724 3.447a.75.75 0 01-1.086.299l-3.447-1.724a.75.75 0 01-.299-1.086l1.724-3.447a.75.75 0 01.855-.162A10.845 10.845 0 1112 3c3.923 0 7.464 2.215 9.174 5.513a.75.75 0 01-1.086.299l-3.447-1.724a.75.75 0 01-.299-1.086l1.724-3.447a.75.75 0 01.162-.855 10.845 10.845 0 00-11.152 0zM12 5.25a7.5 7.5 0 00-6.147 12.443.75.75 0 01-.855.162l-3.447 1.724a.75.75 0 01-.299 1.086l1.724 3.447a.75.75 0 011.086.299l3.447-1.724a.75.75 0 01.299-1.086A7.5 7.5 0 0012 5.25z" clip-rule="evenodd" />
+        </svg>
+        <span class="theme-text">Dark Mode</span>
+    </button>
+
+    <script>
+        const backgroundShapes = document.getElementById('background-shapes');
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = themeToggle.querySelector('.sun-icon');
+        const moonIcon = themeToggle.querySelector('.moon-icon');
+        const themeText = themeToggle.querySelector('.theme-text');
+        const animatedHeading = document.getElementById('animated-heading');
+        const animatedParagraphs = document.querySelectorAll('.animated-paragraph');
+        const headingText = "Unlock Compiler Performance Insights"; // Original heading text
+
+        // Function to navigate to the compiler app
+        function navigateToCompiler(event) {
+            event.preventDefault();
+            const button = event.target;
+            
+            // Add clicking class for animation
+            button.classList.add('clicking');
+            
+            // Ensure navigation happens after animation
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 300); // Match animation duration
+        }
+
+        // Parallax effect for background shapes
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            backgroundShapes.style.transform = `translateY(${scrollY * 0.2}px)`;
+        });
+
+        // Typewriter Effect for Heading
+        function typeWriter(text, i, fnCallback) {
+            if (i < text.length) {
+                animatedHeading.innerHTML = text.substring(0, i + 1);
+                setTimeout(function() {
+                    typeWriter(text, i + 1, fnCallback);
+                }, 70); // Typing speed
+            } else if (typeof fnCallback == 'function') {
+                setTimeout(fnCallback, 700); // Delay before paragraphs start
+            }
+        }
+
+        // Staggered Fade-in for Paragraphs
+        function animateParagraphs() {
+            animatedParagraphs.forEach((p, index) => {
+                setTimeout(() => {
+                    p.classList.add('fade-in-active');
+                }, index * 400); // Stagger by 400ms
+            });
+        }
+
+        // Initialize animations on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Start typewriter animation after the content-wrapper pop-in
+            setTimeout(() => {
+                typeWriter(headingText, 0, () => {
+                    // Once heading is typed, start paragraph animations
+                    animateParagraphs();
+                    // Show the scroll indicator after all text animations
+                    setTimeout(() => {
+                        document.querySelector('.scroll-indicator').style.opacity = '1';
+                    }, (animatedParagraphs.length * 400) + 500); // Delay based on paragraph animation
+                });
+            }, 900); // Matches the popIn animation duration for content-wrapper
+        });
+
+        // Theme Toggling Logic
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+            themeText.textContent = 'Light Mode';
+        } else {
+            document.body.classList.remove('dark-mode');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+            themeText.textContent = 'Dark Mode';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+                themeText.textContent = 'Light Mode';
+            } else {
+                localStorage.setItem('theme', 'light');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+                themeText.textContent = 'Dark Mode';
+            }
+        });
+
+    </script>
+</body>
+</html>

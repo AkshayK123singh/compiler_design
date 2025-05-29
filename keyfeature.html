@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compiler Insights - Key Features</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom CSS Variables for Theming */
+        :root {
+            /* Light Theme Defaults for Features Page */
+            --features-bg-start: #e0f2f7; /* Lighter blue-gray */
+            --features-bg-end: #cce7f0;    /* Slightly darker blue-gray */
+            --features-container-bg: #ffffff;
+            --features-container-border: #e0e7eb;
+            --features-heading-color: #1a252f;
+            --features-text-color: #34495e;
+            --features-card-bg: #f9fbfd;
+            --features-card-border: #d0d7db;
+            --features-icon-color: #3498db; /* Blue */
+            --features-button-bg: #3498db;
+            --features-button-text: white;
+            --features-button-hover-bg: #2980b9;
+            --features-theme-toggle-bg: #ecf0f1;
+            --features-theme-toggle-text: #34495e;
+            --features-theme-toggle-hover-bg: #bdc3c7;
+            --features-highlight-color: #2ecc71; /* A nice green for highlights */
+
+            /* Navbar specific variables */
+            --navbar-bg: rgba(255, 255, 255, 0.8); /* Semi-transparent white for light mode */
+            --navbar-link-color: #34495e; /* Darker text for light mode */
+            --navbar-link-hover-color: #000000;
+            --navbar-border: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Dark Theme Overrides for Features Page */
+        body.dark-mode {
+            --features-bg-start: #2c3e50;
+            --features-bg-end: #1a252f;
+            --features-container-bg: #1a252f;
+            --features-container-border: #4a627a;
+            --features-heading-color: #f0f8ff;
+            --features-text-color: #bdc3c7;
+            --features-card-bg: #2c3e50;
+            --features-card-border: #4a627a;
+            --features-icon-color: #82cafa; /* Lighter blue */
+            --features-button-bg: #5dade2;
+            --features-button-text: #1a252f;
+            --features-button-hover-bg: #4a90d9;
+            --features-theme-toggle-bg: #4a627a;
+            --features-theme-toggle-text: #ecf0f1;
+            --features-theme-toggle-hover-bg: #5a728a;
+            --features-highlight-color: #a4ddb1; /* A lighter green for dark mode */
+
+            /* Navbar specific variables (dark mode) */
+            --navbar-bg: rgba(0, 0, 0, 0.7); /* Semi-transparent dark for dark mode */
+            --navbar-link-color: #e0e7eb;
+            --navbar-link-hover-color: #ffffff;
+            --navbar-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--features-bg-start) 0%, var(--features-bg-end) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+            transition: background 0.7s ease-in-out, color 0.7s ease-in-out;
+            color: var(--features-text-color);
+            overflow-x: hidden;
+            position: relative;
+            background-size: 200% 200%; /* For background animation */
+            animation: gradientPan 15s linear infinite alternate; /* Subtle background animation */
+            padding-top: 6rem; /* Add padding to account for fixed navbar */
+        }
+
+        @keyframes gradientPan {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--navbar-bg);
+            backdrop-filter: blur(8px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-bottom: 1px solid var(--navbar-border);
+            transition: background-color 0.7s ease-in-out, border-color 0.7s ease-in-out, box-shadow 0.7s ease-in-out;
+        }
+        .navbar .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--navbar-link-color);
+            text-decoration: none;
+            transition: color 0.7s ease-in-out;
+        }
+        .navbar .nav-links a {
+            color: var(--navbar-link-color);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .navbar .nav-links a:hover {
+            background-color: rgba(0, 0, 0, 0.1); /* Darker hover for light mode */
+            color: var(--navbar-link-hover-color);
+            transform: translateY(-2px);
+        }
+        body.dark-mode .navbar .nav-links a:hover {
+             background-color: rgba(255, 255, 255, 0.1); /* Lighter hover for dark mode */
+        }
+
+        .container {
+            background-color: var(--features-container-bg);
+            padding: 3rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 7xl;
+            border: 1px solid var(--features-container-border);
+            animation: fadeIn 1s ease-out;
+            transition: background-color 0.7s ease-in-out, border-color 0.7s ease-in-out, box-shadow 0.7s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 2.5rem;
+            color: var(--features-heading-color);
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            transition: color 0.7s ease-in-out;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .feature-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .feature-card {
+            background-color: var(--features-card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid var(--features-card-border);
+            box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.1), 0 4px 10px -3px rgba(0, 0, 0, 0.05);
+            text-align: left;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smoother transition */
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideInUp 0.6s ease-out forwards;
+            position: relative; /* Needed for ::after positioning */
+            overflow: hidden; /* Ensures the border stays within bounds */
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px) scale(1.01); /* Subtle scale on hover */
+            box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.15), 0 6px 12px -3px rgba(0, 0, 0, 0.08); /* Enhanced shadow */
+        }
+
+        /* Highlight border on hover */
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0; /* Initial width */
+            height: 4px; /* Thickness of the highlight */
+            background-color: var(--features-highlight-color);
+            border-radius: 0 0 1rem 1rem; /* Match card border radius */
+            transition: width 0.3s ease-out; /* Animation for width */
+        }
+
+        .feature-card:hover::after {
+            width: 100%; /* Expand to full width on hover */
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.2s; }
+        .feature-card:nth-child(2) { animation-delay: 0.4s; }
+        .feature-card:nth-child(3) { animation-delay: 0.6s; }
+        .feature-card:nth-child(4) { animation-delay: 0.8s; }
+        .feature-card:nth-child(5) { animation-delay: 1.0s; }
+        .feature-card:nth-child(6) { animation-delay: 1.2s; }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feature-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--features-icon-color);
+            transition: color 0.7s ease-in-out, transform 0.3s ease-in-out; /* Transition for the pulse */
+            animation: pulsate 2s ease-in-out infinite alternate; /* Pulsating animation */
+        }
+
+        @keyframes pulsate {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        .feature-card h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--features-heading-color);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.05);
+            transition: color 0.7s ease-in-out;
+        }
+
+        .feature-card p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--features-text-color);
+            transition: color 0.7s ease-in-out;
+        }
+
+        .back-button {
+            background-color: var(--features-button-bg);
+            color: var(--features-button-text);
+            padding: 0.8rem 2rem;
+            border-radius: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: 3rem;
+            display: inline-block;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: var(--features-button-hover-bg);
+            transform: translateY(-2px) scale(1.01); /* Subtle lift and scale */
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Theme Toggle Button */
+        #theme-toggle {
+            position: fixed; /* Changed to fixed to stay at bottom */
+            bottom: 2rem; /* Position at the bottom */
+            right: 2rem;
+            background-color: var(--features-theme-toggle-bg);
+            color: var(--features-theme-toggle-text);
+            border: none;
+            border-radius: 9999px;
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            z-index: 101; /* Higher z-index */
+        }
+        #theme-toggle:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            background-color: var(--features-theme-toggle-hover-bg);
+        }
+        #theme-toggle svg {
+            width: 1.35rem;
+            height: 1.35rem;
+            fill: currentColor;
+            transition: transform 0.3s ease;
+        }
+        #theme-toggle:hover .sun-icon {
+            transform: rotate(30deg);
+        }
+        #theme-toggle:hover .moon-icon {
+            transform: rotate(-30deg);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            .navbar .nav-links {
+                margin-top: 1rem;
+            }
+            .navbar .nav-links a {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            h1 {
+                font-size: 2.5rem;
+            }
+            .container {
+                padding: 1.5rem;
+                padding-top: 2rem; /* Adjust padding for smaller screens if needed */
+            }
+            .feature-card {
+                padding: 1.5rem;
+            }
+            .feature-card .icon {
+                font-size: 2.5rem;
+            }
+            .feature-card h2 {
+                font-size: 1.5rem;
+            }
+            .feature-card p {
+                font-size: 1rem;
+            }
+            .back-button {
+                padding: 0.6rem 1.5rem;
+                font-size: 1rem;
+            }
+            #theme-toggle {
+                bottom: 1rem; /* Adjust for smaller screens */
+                right: 1rem;
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+            #theme-toggle svg {
+                width: 1.1rem;
+                height: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="front.html" class="logo">Compiler Insights</a>
+        <div class="nav-links flex space-x-4">
+            <a href="front.html">Home</a>
+            <a href="keyfeature.html">Features</a>
+            <a href="about.html">About</a>
+            <a href="index.html">App</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="text-center">Our Powerful Features</h1>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="icon">⚡</div>
+                <h2>Real-time Performance Metrics</h2>
+                <p>Gain immediate insights into how your code performs. Our platform provides detailed metrics on execution time, memory consumption, and CPU usage for both Just-In-Time (JIT) and Classical (GCC) compilation environments. Understand the nuances of each approach at a glance.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">📊</div>
+                <h2>Interactive Visualizations</h2>
+                <p>Transform complex data into clear, interactive charts. Our dynamic graphs allow you to visualize compiler performance data, making it easy to identify trends, compare results, and derive meaningful conclusions from your analysis.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🔄</div>
+                <h2>Code Comparison & History</h2>
+                <p>Track your code's evolution and performance over time. Save snapshots of your compilation results and compare them against previous runs. This feature is invaluable for optimizing code, debugging performance bottlenecks, and validating improvements.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">✍️</div>
+                <h2>Custom Code Execution</h2>
+                <p>Unleash your creativity and test any C code snippet directly within our environment. Whether you're experimenting with new algorithms or refining existing ones, our integrated editor and execution engine provide a seamless experience.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">📚</div>
+                <h2>Pre-defined Examples Library</h2>
+                <p>Jumpstart your analysis with our curated library of pre-defined code examples. From "Hello World" to complex algorithms, these examples allow you to quickly understand compiler behaviors and explore different scenarios without writing code from scratch.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">💡</div>
+                <h2>Intuitive User Interface</h2>
+                <p>Experience a clean, modern, and user-friendly interface designed for clarity and efficiency. Navigate effortlessly through features, interpret data with ease, and enjoy a smooth, responsive interaction tailored for an optimal user experience.</p>
+            </div>
+        </div>
+
+        <a href="front.html" class="back-button">Back to Home</a>
+    </div>
+
+    <button id="theme-toggle" aria-label="Toggle theme">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3A.75.75 0 0112 2.25zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.06l1.59-1.591zM12 18a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V18a.75.75 0 01.75-.75zM5.05 10.95a.75.75 0 10-1.06-1.06l-1.59 1.59a.75.75 0 101.06 1.06l1.59-1.59zM18.894 17.894a.75.75 0 001.06-1.06l-1.59-1.59a.75.75 0 00-1.06 1.06l1.59 1.59zM3.27 6.106a.75.75 0 001.06-1.06l1.59-1.59a.75.75 0 00-1.06-1.06l-1.59 1.59a.75.75 0 000 1.06zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM12 6a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H12A.75.75 0 0112 6z"/>
+        </svg>
+        <svg class="moon-icon hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.855l-1.724 3.447a.75.75 0 01-1.086.299l-3.447-1.724a.75.75 0 01-.299-1.086l1.724-3.447a.75.75 0 01.855-.162A10.845 10.845 0 1112 3c3.923 0 7.464 2.215 9.174 5.513a.75.75 0 01-1.086.299l-3.447-1.724a.75.75 0 01-.299-1.086l1.724-3.447a.75.75 0 01.162-.855 10.845 10.845 0 00-11.152 0zM12 5.25a7.5 7.5 0 00-6.147 12.443.75.75 0 01-.855.162l-3.447 1.724a.75.75 0 01-.299 1.086l1.724 3.447a.75.75 0 011.086.299l3.447-1.724a.75.75 0 01.299-1.086A7.5 7.5 0 0012 5.25z" clip-rule="evenodd" />
+        </svg>
+        <span class="theme-text">Dark Mode</span>
+    </button>
+
+    <script>
+        // Theme Toggling Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = themeToggle.querySelector('.sun-icon');
+        const moonIcon = themeToggle.querySelector('.moon-icon');
+        const themeText = themeToggle.querySelector('.theme-text');
+
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+            themeText.textContent = 'Light Mode';
+        } else {
+            document.body.classList.remove('dark-mode');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+            themeText.textContent = 'Dark Mode';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+                themeText.textContent = 'Light Mode';
+            } else {
+                localStorage.setItem('theme', 'light');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+                themeText.textContent = 'Dark Mode';
+            }
+        });
+    </script>
+</body>
+</html>

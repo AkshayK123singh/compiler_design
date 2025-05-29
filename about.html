@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Compiler Insights Project</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Custom CSS Variables for Theming */
+        :root {
+            /* Light Theme Defaults for About Page */
+            --about-bg-start: #e0f2f7; /* Lighter blue-gray */
+            --about-bg-end: #cce7f0;   /* Slightly darker blue-gray */
+            --about-container-bg: rgba(255, 255, 255, 0.7); /* Frosted */
+            --about-container-border: rgba(224, 231, 235, 0.8);
+            --about-heading-color: #1a252f;
+            --about-subheading-color: #1a5276;
+            --about-text-color: #34495e;
+            --about-card-bg: rgba(249, 251, 253, 0.6); /* Frosted */
+            --about-card-border: rgba(208, 215, 219, 0.7);
+            --about-icon-color: #3498db;
+            --about-button-bg: #3498db;
+            --about-button-text: white;
+            --about-button-hover-bg: #2980b9;
+            --about-theme-toggle-bg: #ecf0f1;
+            --about-theme-toggle-text: #34495e;
+            --about-theme-toggle-hover-bg: #bdc3c7;
+            --about-h1-gradient-start: #3498db;
+            --about-h1-gradient-end: #2ecc71; /* Green accent */
+            --about-list-hover-bg: rgba(52, 152, 219, 0.1); /* Light blue highlight */
+
+            /* Navbar specific variables */
+            --navbar-bg: rgba(255, 255, 255, 0.5); /* Transparent white */
+            --navbar-border: rgba(200, 200, 200, 0.3);
+            --navbar-text-color: #34495e;
+            --navbar-hover-color: #3498db;
+            --navbar-active-color: #2980b9;
+        }
+
+        /* Dark Theme Overrides for About Page */
+        body.dark-mode {
+            --about-bg-start: #2c3e50;
+            --about-bg-end: #1a252f;
+            --about-container-bg: rgba(26, 37, 47, 0.7); /* Frosted */
+            --about-container-border: rgba(74, 98, 122, 0.8);
+            --about-heading-color: #f0f8ff;
+            --about-subheading-color: #82cafa;
+            --about-text-color: #bdc3c7;
+            --about-card-bg: rgba(44, 62, 80, 0.6); /* Frosted */
+            --about-card-border: rgba(74, 98, 122, 0.7);
+            --about-icon-color: #82cafa;
+            --about-button-bg: #5dade2;
+            --about-button-text: #1a252f;
+            --about-button-hover-bg: #4a90d9;
+            --about-theme-toggle-bg: #4a627a;
+            --about-theme-toggle-text: #ecf0f1;
+            --about-theme-toggle-hover-bg: #5a728a;
+            --about-h1-gradient-start: #82cafa;
+            --about-h1-gradient-end: #a4ddb1; /* Lighter green accent */
+            --about-list-hover-bg: rgba(130, 202, 250, 0.1); /* Light blue highlight */
+
+            /* Navbar specific variables (Dark Mode) */
+            --navbar-bg: rgba(26, 37, 47, 0.5); /* Transparent dark blue */
+            --navbar-border: rgba(74, 98, 122, 0.3);
+            --navbar-text-color: #ecf0f1;
+            --navbar-hover-color: #82cafa;
+            --navbar-active-color: #5dade2;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--about-bg-start) 0%, var(--about-bg-end) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            /* Adjust padding-top to ensure content is below the fixed navbar */
+            padding-top: 6rem;
+            /* Keep padding-bottom to ensure space below the last content block, above the theme toggle */
+            padding-bottom: 5rem; /* Increased to give space for button */
+            padding-left: 2rem;
+            padding-right: 2rem;
+            transition: background 0.7s ease-in-out, color 0.7s ease-in-out;
+            color: var(--about-text-color);
+            overflow-x: hidden;
+            position: relative; /* Needed for parallax background and absolute positioned elements */
+        }
+
+        /* Parallax background effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://source.unsplash.com/random/1600x900/?coding,abstract,tech') no-repeat center center / cover; /* Example background image */
+            opacity: 0.15; /* Subtle overlay */
+            z-index: -1; /* Behind content */
+            animation: backgroundPan 60s linear infinite alternate; /* Slow pan animation */
+        }
+
+        @keyframes backgroundPan {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: var(--navbar-bg);
+            border-bottom: 1px solid var(--navbar-border);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 20; /* Above content */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.7s ease-in-out, border-color 0.7s ease-in-out, box-shadow 0.7s ease-in-out;
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: var(--navbar-text-color);
+            text-decoration: none;
+            background: linear-gradient(90deg, var(--about-h1-gradient-start), var(--about-h1-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem; /* Increased space between links */
+        }
+
+        .nav-links a {
+            color: var(--navbar-text-color);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 3px; /* Underline thickness */
+            background-color: var(--navbar-hover-color);
+            transition: width 0.3s ease-out;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--navbar-hover-color);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a.active {
+            color: var(--navbar-active-color);
+            font-weight: 700;
+        }
+
+        .nav-links a.active::after {
+            width: 100%;
+            background-color: var(--navbar-active-color);
+        }
+
+        /* Main Content Styling (existing) */
+        .container {
+            background-color: var(--about-container-bg);
+            padding: 3rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 7xl;
+            border: 1px solid var(--about-container-border);
+            animation: fadeIn 1s ease-out;
+            transition: background-color 0.7s ease-in-out, border-color 0.7s ease-in-out, box-shadow 0.7s ease-in-out;
+            backdrop-filter: blur(10px); /* Glassmorphism effect */
+            -webkit-backdrop-filter: blur(10px); /* Safari support */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Animation for scroll-revealed sections */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4.2rem; /* Larger heading */
+            font-weight: 800;
+            margin-bottom: 2.5rem;
+            color: var(--about-heading-color);
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+            transition: color 0.7s ease-in-out;
+            
+            /* Gradient Text */
+            background: linear-gradient(90deg, var(--about-h1-gradient-start), var(--about-h1-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent; /* Fallback for browsers not supporting text-fill-color */
+        }
+
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem; /* Slightly larger */
+            font-weight: 700;
+            margin-top: 2.5rem; /* More spacing */
+            margin-bottom: 1.5rem;
+            color: var(--about-subheading-color);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.08);
+            transition: color 0.7s ease-in-out;
+            padding-bottom: 0.75rem; /* More padding for underline */
+            position: relative;
+        }
+
+        h2::after { /* Animated underline */
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px; /* Initial width */
+            height: 4px; /* Thickness */
+            background: var(--about-icon-color);
+            border-radius: 2px;
+            transition: width 0.3s ease-out, background 0.7s ease-in-out;
+        }
+
+        h2:hover::after {
+            width: 100px; /* Expand on hover */
+        }
+
+        h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--about-heading-color);
+            transition: color 0.7s ease-in-out;
+        }
+
+        p {
+            font-size: 1.15rem; /* Slightly larger text */
+            line-height: 1.8; /* Improved readability */
+            margin-bottom: 1.2rem;
+            color: var(--about-text-color);
+            transition: color 0.7s ease-in-out;
+        }
+
+        ul {
+            list-style-type: none; /* Remove default bullet */
+            margin-left: 0;
+            padding-left: 0;
+            margin-bottom: 1.5rem;
+            color: var(--about-text-color);
+        }
+
+        li {
+            margin-bottom: 0.8rem;
+            padding: 0.5rem 0 0.5rem 2rem; /* Add padding for highlight */
+            position: relative;
+            transition: background-color 0.3s ease, color 0.7s ease-in-out, transform 0.2s ease;
+            border-radius: 0.5rem;
+            overflow: hidden; /* Ensure gradient highlight is contained */
+            cursor: default; /* Indicate non-clickable */
+        }
+
+        li::before {
+            content: '➤'; /* Modern arrow bullet */
+            color: var(--about-icon-color);
+            position: absolute;
+            left: 0.75rem;
+            font-size: 1em;
+            line-height: 1.5; /* Align with text */
+            top: 50%;
+            transform: translateY(-50%);
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+
+        li:hover {
+            background-color: var(--about-list-hover-bg);
+            transform: translateX(5px); /* Slide effect on hover */
+        }
+
+        li:hover::before {
+            color: var(--about-button-hover-bg); /* Change bullet color on hover */
+            transform: translateY(-50%) translateX(3px);
+        }
+
+        .section-card {
+            background-color: var(--about-card-bg);
+            border: 1px solid var(--about-card-border);
+            border-radius: 1.2rem; /* Slightly more rounded */
+            padding: 2.5rem; /* More padding */
+            margin-bottom: 2.5rem; /* More spacing */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1); /* Stronger shadow */
+            transition: background-color 0.7s ease-in-out, border-color 0.7s ease-in-out, box-shadow 0.3s ease, transform 0.3s ease;
+            backdrop-filter: blur(8px); /* Glassmorphism effect */
+            -webkit-backdrop-filter: blur(8px); /* Safari support */
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px) scale(1.005); /* Lift and slightly scale on hover */
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); /* Enhanced shadow on hover */
+        }
+
+        .back-button {
+            background-color: var(--about-button-bg);
+            color: var(--about-button-text);
+            padding: 1rem 2.5rem; /* Larger button */
+            border-radius: 0.75rem;
+            font-size: 1.15rem;
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: 4rem; /* More space */
+            display: inline-block;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Stronger shadow */
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px; /* Slight letter spacing */
+        }
+
+        .back-button:hover {
+            background-color: var(--about-button-hover-bg);
+            transform: translateY(-5px) scale(1.03); /* More pronounced lift and scale */
+            box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+        }
+
+        /* Theme Toggle Button - POSITION ABSOLUTE AT BOTTOM */
+        #theme-toggle {
+            position: absolute; /* Relative to the body element */
+            bottom: 2rem; /* Distance from the bottom of the body */
+            right: 2rem; /* Distance from the right of the body */
+            background-color: var(--about-theme-toggle-bg);
+            color: var(--about-theme-toggle-text);
+            border: none;
+            border-radius: 9999px;
+            padding: 0.8rem 1.4rem; /* Slightly larger padding */
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.18); /* Slightly stronger shadow */
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem; /* More gap */
+            z-index: 10; /* Ensure it's above other content but below fixed navbar */
+        }
+        #theme-toggle:hover {
+            transform: translateY(-3px) scale(1.06); /* More pronounced */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+            background-color: var(--about-theme-toggle-hover-bg);
+        }
+        #theme-toggle svg {
+            width: 1.4rem; /* Slightly larger icon */
+            height: 1.4rem;
+            fill: currentColor;
+            transition: transform 0.3s ease;
+        }
+        #theme-toggle:hover .sun-icon {
+            transform: rotate(45deg) scale(1.1); /* More rotation and scale */
+        }
+        #theme-toggle:hover .moon-icon {
+            transform: rotate(-45deg) scale(1.1);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 8rem; /* More space for stacked navbar */
+            }
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+            .nav-links {
+                margin-top: 1rem;
+                gap: 1.5rem;
+                width: 100%;
+                justify-content: center;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+            .nav-links a {
+                font-size: 1rem;
+            }
+            .container {
+                padding: 2rem;
+            }
+            h1 {
+                font-size: 3rem;
+            }
+            h2 {
+                font-size: 2rem;
+            }
+            .section-card {
+                padding: 1.5rem;
+            }
+            /* Adjust theme toggle for smaller screens */
+            #theme-toggle {
+                bottom: 1.5rem; /* Closer to bottom on mobile */
+                right: 1.5rem; /* Closer to edge */
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+                gap: 0.4rem;
+            }
+            #theme-toggle svg {
+                width: 1.2rem;
+                height: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding-top: 9rem; /* Even more space for very small screens with stacked navbar */
+            }
+            .navbar {
+                padding: 0.8rem;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            .logo {
+                font-size: 1.3rem;
+            }
+            .nav-links a {
+                font-size: 0.9rem;
+                padding: 0.3rem 0;
+            }
+            h1 {
+                font-size: 2.5rem;
+                margin-bottom: 2rem;
+            }
+            h2 {
+                font-size: 1.75rem;
+                margin-top: 1.5rem;
+            }
+            h3 {
+                font-size: 1.5rem;
+            }
+            p {
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+            .container {
+                padding: 1.5rem;
+                border-radius: 1rem;
+            }
+            .section-card {
+                padding: 1rem;
+                border-radius: 0.8rem;
+            }
+            .back-button {
+                padding: 0.8rem 2rem;
+                font-size: 1rem;
+                margin-top: 2.5rem;
+            }
+            #theme-toggle {
+                bottom: 1rem; /* Even closer to bottom */
+                right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="front.html" class="logo">Compiler Insights</a>
+        <div class="nav-links flex space-x-4">
+            <a href="front.html">Home</a>
+            <a href="keyfeature.html">Features</a>
+            <a href="about.html" class="active">About</a>
+            <a href="index.html">App</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="text-center fade-in-section">About Compiler Insights</h1>
+        
+        <p class="text-center text-lg mb-8 fade-in-section">
+            This project provides a comprehensive platform for comparing the performance of **Just-In-Time (JIT)** and **Classical (GCC)** compilers. It aims to offer insights into their operational differences, efficiency, and resource utilization when executing C code.
+        </p>
+
+        <div class="section-card fade-in-section">
+            <h2>Technological Aspects</h2>
+            <p>The Compiler Insights application is built using a modern web stack, leveraging various technologies to deliver a seamless user experience and robust functionality:</p>
+            
+            <h3>Frontend Technologies:</h3>
+            <ul>
+                <li><strong>HTML5 & CSS3 (Tailwind CSS):</strong> For structuring the content and applying responsive, utility-first styling.</li>
+                <li><strong>JavaScript:</strong> Powers the interactive elements, data fetching, and dynamic updates.</li>
+                <li><strong>CodeMirror:</strong> An in-browser code editor that provides syntax highlighting and a rich editing experience for C code.</li>
+                <li><strong>Chart.js:</strong> A powerful JavaScript charting library used for visualizing performance metrics (execution time, memory usage, etc.) in interactive graphs.</li>
+            </ul>
+        </div>
+
+        <div class="section-card fade-in-section">
+            <h3>Backend Simulation (Conceptual):</h3>
+            <p>While this is a client-side application running in a browser environment, the core functionality simulates interactions with a backend that would typically handle the compilation and execution. In a full-fledged deployment, this would involve:</p>
+            <ul>
+                <li><strong>JIT Compiler:</strong> A Just-In-Time compiler environment (e.g., a custom interpreter or a runtime like LLVM's JIT infrastructure) to compile and execute code on the fly.</li>
+                <li><strong>Classical Compiler (GCC):</strong> A standard C compiler like GCC to compile the code into an executable binary, which is then run.</li>
+                <li><strong>Resource Monitoring:</strong> Tools to capture real-time metrics such as execution time, memory usage, and CPU time for both compilation approaches.</li>
+                <li><strong>API Endpoints:</strong> RESTful APIs to receive code, trigger compilation/execution, and return performance data.</li>
+            </ul>
+        </div>
+
+        <div class="section-card fade-in-section">
+            <h2>Theoretical Aspects</h2>
+            <p>The project delves into fundamental concepts of compiler design and performance analysis:</p>
+
+            <h3>Just-In-Time (JIT) Compilation:</h3>
+            <ul>
+                <li><strong>Principle:</strong> JIT compilers translate bytecode or intermediate code into native machine code at runtime, just before execution.</li>
+                <li><strong>Advantages:</strong> Can achieve high performance by optimizing code based on runtime profiling (e.g., hot spots), leading to adaptive optimizations. Reduced startup time compared to classical compilation if code is executed incrementally.</li>
+                <li><strong>Disadvantages:</strong> Incurs a runtime overhead for compilation. May not always produce as highly optimized code as a classical compiler due to time constraints during execution.</li>
+                <li><strong>Use Cases:</strong> Popular in languages like Java, C#, JavaScript (V8 engine), Python (PyPy), where flexibility and dynamic features are crucial.</li>
+            </ul>
+        </div>
+
+        <div class="section-card fade-in-section">
+            <h3>Classical (Ahead-of-Time - AOT) Compilation:</h3>
+            <ul>
+                <li><strong>Principle:</strong> Classical compilers (like GCC) translate source code into machine code before execution, creating a standalone executable.</li>
+                <li><strong>Advantages:</strong> Produces highly optimized machine code as it has ample time for extensive analysis and optimization passes. No runtime compilation overhead.</li>
+                <li><strong>Disadvantages:</strong> Longer compilation times. Less flexible for dynamic code generation or runtime adaptations.</li>
+                <li><strong>Use Cases:</strong> Dominant in systems programming languages like C, C++, Rust, where maximum performance and control over hardware are paramount.</li>
+            </ul>
+        </div>
+
+        <div class="section-card fade-in-section">
+            <h3>Performance Metrics:</h3>
+            <p>The application focuses on key metrics to compare compiler efficiency:</p>
+            <ul>
+                <li><strong>Execution Time:</strong> The actual time taken for the compiled program to run.</li>
+                <li><strong>Memory Usage:</strong> The amount of RAM consumed by the program during its execution.</li>
+                <li><strong>CPU User Time:</strong> The amount of CPU time spent executing user-mode instructions.</li>
+                <li><strong>CPU System Time:</strong> The amount of CPU time spent executing kernel-mode instructions on behalf of the process.</li>
+                <li><strong>Compile Time:</strong> The time taken by the compiler to transform source code into executable form.</li>
+                <li><strong>Total Time:</strong> The sum of compile time and execution time, providing a holistic view of the overall process efficiency.</li>
+            </ul>
+            <p>By comparing these metrics across JIT and Classical compilation, users can gain a deeper understanding of the trade-offs involved in different compilation strategies for various code patterns.</p>
+        </div>
+
+        <a href="index.html" class="back-button">Back to Compiler App</a>
+    </div>
+
+    <button id="theme-toggle" aria-label="Toggle theme">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3A.75.75 0 0112 2.25zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.06l1.59-1.591zM12 18a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V18a.75.75 0 01.75-.75zM5.05 10.95a.75.75 0 10-1.06-1.06l-1.59 1.59a.75.75 0 101.06 1.06l1.59-1.59zM18.894 17.894a.75.75 0 001.06-1.06l-1.59-1.59a.75.75 0 00-1.06 1.06l1.59 1.59zM3.27 6.106a.75.75 0 001.06-1.06l1.59-1.59a.75.75 0 00-1.06-1.06l-1.59 1.59a.75.75 0 000 1.06zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM12 6a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H12A.75.75 0 0112 6z"/>
+        </svg>
+        <svg class="moon-icon hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.855l-1.724 3.447a.75.75 0 01-1.086.299l-3.447-1.724a.75.75 0 01-.299-1.086l1.724-3.447a.75.75 0 01.855-.162A10.845 10.845 0 1112 3c3.923 0 7.464 2.215 9.174 5.513a.75.75 0 01-1.086.299l-3.447-1.724a.75.75 0 01-.299-1.086l1.724-3.447a.75.75 0 01.162-.855 10.845 10.845 0 00-11.152 0zM12 5.25a7.5 7.5 0 00-6.147 12.443.75.75 0 01-.855.162l-3.447 1.724a.75.75 0 01-.299 1.086l1.724 3.447a.75.75 0 011.086.299l3.447-1.724a.75.75 0 01.299-1.086A7.5 7.5 0 0012 5.25z" clip-rule="evenodd" />
+        </svg>
+        <span class="theme-text">Dark Mode</span>
+    </button>
+
+    <script>
+        // Theme Toggling Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = themeToggle.querySelector('.sun-icon');
+        const moonIcon = themeToggle.querySelector('.moon-icon');
+        const themeText = themeToggle.querySelector('.theme-text');
+
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+            themeText.textContent = 'Light Mode';
+        } else {
+            document.body.classList.remove('dark-mode');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+            themeText.textContent = 'Dark Mode';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+                themeText.textContent = 'Light Mode';
+            } else {
+                localStorage.setItem('theme', 'light');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+                themeText.textContent = 'Dark Mode';
+            }
+        });
+
+        // Intersection Observer for scroll animations
+        const fadeSections = document.querySelectorAll('.fade-in-section');
+
+        const observerOptions = {
+            root: null, // viewport
+            rootMargin: '0px',
+            threshold: 0.1 // 10% of the element must be visible
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    // Stop observing once visible to prevent re-triggering
+                    observer.unobserve(entry.target); 
+                }
+            });
+        }, observerOptions);
+
+        fadeSections.forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
